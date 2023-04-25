@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:projecto/src/widget/calendar.dart';
 
@@ -36,6 +38,7 @@ class ReminderList extends StatefulWidget {
 
 class _ReminderListState extends State<ReminderList> {
   List<Reminder> _reminders = [];
+  late List<bool> isChecked = [];
 
   void _addReminder(String title, String description) {
     setState(() {
@@ -45,6 +48,19 @@ class _ReminderListState extends State<ReminderList> {
 
   @override
   Widget build(BuildContext context) {
+    
+
+    Color getColor(Set<MaterialState> states) {
+      const Set<MaterialState> interactiveStates = <MaterialState>{
+        MaterialState.pressed,
+        MaterialState.hovered,
+        MaterialState.focused,
+      };
+      if (states.any(interactiveStates.contains)) {
+        return Colors.blue;
+      }
+      return Colors.blue;
+    }
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
@@ -63,18 +79,33 @@ class _ReminderListState extends State<ReminderList> {
         itemCount: _reminders.length,
         itemBuilder: (context, index) {
           final reminder = _reminders[index];
+          Text titleDim = Text(reminder.title, style: TextStyle(
+            fontWeight: isChecked[index] ? FontWeight.normal : FontWeight.bold, decoration: isChecked[index] ? TextDecoration.lineThrough : TextDecoration.none
+            ),
+          );
+          Text subtitleDim = Text(reminder.description, style: TextStyle(
+            fontWeight: isChecked[index] ? FontWeight.normal : FontWeight.bold, decoration: isChecked[index] ? TextDecoration.lineThrough : TextDecoration.none
+            ),
+          );
+          
+          bool check = false;
+          isChecked.add(check);
           return Card(
             elevation: 2.0,
             child: ListTile(
               leading: Checkbox(
-                value: false, 
+                fillColor: MaterialStateProperty.resolveWith(getColor),
+                value: isChecked[index], 
                 onChanged: (value) {
-                  value = value!; 
+                  setState(() {
+                    isChecked[index] = value!;
+                    
+                  });
                 },
 
               ),
-              title: Text(reminder.title),
-              subtitle: Text(reminder.description),
+              title: titleDim,
+              subtitle: subtitleDim,
               trailing: IconButton(
                 icon: Icon(Icons.delete),
                 onPressed: () {
