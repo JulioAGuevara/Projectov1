@@ -1,71 +1,25 @@
 import 'package:flutter/material.dart';
 
 class EditDialog extends StatefulWidget {
-  final Function(String, String) onAddReminder;
-
-  EditDialog({required this.onAddReminder});
+  const EditDialog({super.key});
 
   @override
-  _EditDialogState createState() => _EditDialogState();
+  State<EditDialog> createState() => _EditDialogState();
 }
 
 class _EditDialogState extends State<EditDialog> {
-  late TextEditingController _titleController;
-  late TextEditingController _descriptionController;
-
-  @override
-  void initState() {
-    super.initState();
-    _titleController = TextEditingController();
-    _descriptionController = TextEditingController();
-  }
-
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text("Add a new reminder"),
+      title: Text('Editar'),
       content: Column(
-        mainAxisSize: MainAxisSize.min,
         children: [
           TextField(
-            controller: _titleController,
-            autofocus: true,
-            decoration: InputDecoration(
-              labelText: "Title",
-            ),
+            controller: ,
           ),
-          TextField(
-            controller: _descriptionController,
-            decoration: InputDecoration(
-              labelText: "Description",
-            ),
-          ),
+          TextField(),
         ],
       ),
-      actions: <Widget>[
-        TextButton(
-          child: Text("CANCEL"),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        TextButton(
-          child: Text("ADD"),
-          onPressed: () {
-            widget.onAddReminder(
-              _titleController.text,
-              _descriptionController.text,
-            );
-          },
-        ),
-      ],
     );
-  }
-
-  @override
-  void dispose() {
-    _titleController.dispose();
-    _descriptionController.dispose();
-    super.dispose();
   }
 }

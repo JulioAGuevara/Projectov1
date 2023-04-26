@@ -79,6 +79,8 @@ class _ReminderListState extends State<ReminderList> {
         itemCount: _reminders.length,
         itemBuilder: (context, index) {
           final reminder = _reminders[index];
+          bool check = false;
+          isChecked.add(check);
           Text titleDim = Text(reminder.title, style: TextStyle(
             fontWeight: isChecked[index] ? FontWeight.normal : FontWeight.bold, decoration: isChecked[index] ? TextDecoration.lineThrough : TextDecoration.none
             ),
@@ -87,9 +89,6 @@ class _ReminderListState extends State<ReminderList> {
             fontWeight: isChecked[index] ? FontWeight.normal : FontWeight.bold, decoration: isChecked[index] ? TextDecoration.lineThrough : TextDecoration.none
             ),
           );
-          
-          bool check = false;
-          isChecked.add(check);
           return Card(
             elevation: 2.0,
             child: ListTile(
