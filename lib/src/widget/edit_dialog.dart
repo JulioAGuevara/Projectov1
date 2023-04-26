@@ -15,7 +15,7 @@ class _EditDialogState extends State<EditDialog> {
       content: Column(
         children: [
           TextField(
-            controller: ,
+            
           ),
           TextField(),
         ],
