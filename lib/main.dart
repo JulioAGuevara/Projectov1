@@ -14,7 +14,10 @@ class ReminderApp extends StatelessWidget {
           case '/home':
             return MaterialPageRoute(builder: (context) => ReminderApp());
           case '/calendar':
-            return MaterialPageRoute(builder: (context) => Calendar(reminders: [],));
+            return MaterialPageRoute(
+                builder: (context) => Calendar(
+                      reminders: [],
+                    ));
         }
       },
       debugShowCheckedModeBanner: false,
@@ -39,6 +42,8 @@ class ReminderList extends StatefulWidget {
 class _ReminderListState extends State<ReminderList> {
   List<Reminder> _reminders = [];
   late List<bool> isChecked = [];
+  String searchText = '';
+  bool isSearching = false; // 2. nueva variable
 
   void _addReminder(String title, String description, DateTime date) {
     setState(() {
@@ -59,16 +64,42 @@ class _ReminderListState extends State<ReminderList> {
       }
       return Colors.blue;
     }
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: isSearching
+            ? TextField(
+                onChanged: (value) {
+                  setState(() {
+                    searchText = value;
+                  });
+                },
+                decoration: InputDecoration(
+                  hintText: 'Search...',
+                  border: InputBorder.none,
+                ),
+              )
+            : Text('Check Mate'),
+        actions: [
+          IconButton(
+            onPressed: () {
+              setState(() {
+                if (isSearching) {
+                  searchText = '';
+                }
+                isSearching = !isSearching;
+              });
+            },
+            icon: Icon(isSearching ? Icons.cancel : Icons.search),
+          ),
+        ],
       ),
       bottomNavigationBar: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           IconButton(
-               onPressed: () {
+              onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) => Calendar(reminders: _reminders),
@@ -82,67 +113,70 @@ class _ReminderListState extends State<ReminderList> {
         itemCount: _reminders.length,
         itemBuilder: (context, index) {
           final reminder = _reminders[index];
-          bool check = false;
-          isChecked.add(check);
-          Text titleDim = Text(
-            reminder.title,
-            style: TextStyle(
-                fontWeight: isChecked[index]
-                    ? FontWeight.normal
-                    : FontWeight.bold,
-                decoration: isChecked[index]
-                    ? TextDecoration.lineThrough
-                    : TextDecoration.none),
-          );
-          Text subtitleDim = Text(
-            reminder.description,
-            style: TextStyle(
-                fontWeight: isChecked[index]
-                    ? FontWeight.normal
-                    : FontWeight.bold,
-                decoration: isChecked[index]
-                    ? TextDecoration.lineThrough
-                    : TextDecoration.none),
-          );
+          if (reminder.title.toLowerCase().contains(searchText.toLowerCase()) ||
+              reminder.description
+                  .toLowerCase()
+                  .contains(searchText.toLowerCase())) {
+            bool check = false;
+            isChecked.add(check);
+            Text titleDim = Text(
+              reminder.title,
+              style: TextStyle(
+                  fontWeight:
+                      isChecked[index] ? FontWeight.normal : FontWeight.bold,
+                  decoration: isChecked[index]
+                      ? TextDecoration.lineThrough
+                      : TextDecoration.none),
+            );
+            Text subtitleDim = Text(
+              reminder.description,
+              style: TextStyle(
+                  fontWeight:
+                      isChecked[index] ? FontWeight.normal : FontWeight.bold,
+                  decoration: isChecked[index]
+                      ? TextDecoration.lineThrough
+                      : TextDecoration.none),
+            );
 
-          
-          return Card(
-            elevation: 2.0,
-            child: ListTile(
-              leading: Checkbox(
-                fillColor: MaterialStateProperty.resolveWith(getColor),
-                value: isChecked[index],
-                onChanged: (value) {
-                  setState(() {
-                    isChecked[index] = value!;
-                  });
+            return Card(
+              elevation: 2.0,
+              child: ListTile(
+                leading: Checkbox(
+                  fillColor: MaterialStateProperty.resolveWith(getColor),
+                  value: isChecked[index],
+                  onChanged: (value) {
+                    setState(() {
+                      isChecked[index] = value!;
+                    });
+                  },
+                ),
+                title: titleDim,
+                subtitle: subtitleDim,
+                trailing: IconButton(
+                  icon: Icon(Icons.delete),
+                  onPressed: () {
+                    setState(() {
+                      _reminders.removeAt(index);
+                    });
+                  },
+                ),
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => ReminderDialog(
+                      onAddReminder: (title, description, date) {
+                        _addReminder(title, description, date);
+                        Navigator.pop(context);
+                      },
+                    ),
+                  );
                 },
               ),
-              title: titleDim,
-              subtitle: subtitleDim,
-              trailing: IconButton(
-                icon: Icon(Icons.delete),
-                onPressed: () {
-                  setState(() {
-                    _reminders.removeAt(index);
-                  });
-                },
-              ),
-              onTap: () {
-                showDialog(
-                  context: context,
-                  builder: (context) => ReminderDialog(
-                    onAddReminder: (title, description, date) {
-                      _addReminder(title, description, date);
-                      Navigator.pop(context);
-                    },
-                  ),
-                );
-              },
-            ),
-          );
+            );
+          } else {
+            return Container();
+          }
         },
-     
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
