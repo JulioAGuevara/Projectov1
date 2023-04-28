@@ -2,8 +2,72 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:projecto/src/widget/calendar.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
-void main() => runApp(ReminderApp());
+void main(){
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget{
+const MyApp({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+    debugShowCheckedModeBanner: false,
+    home: efigie(),
+    );
+}
+}
+ 
+ class efigie extends StatefulWidget{
+  const efigie ({Key? key}) : super(key: key);
+
+  @override
+  State<efigie> createState() => _efigie();
+ 
+  }
+
+class _efigie extends State<efigie>{
+  
+   @override
+  void initState() {
+    super.initState();
+    
+    Future.delayed(const Duration(seconds: 6)).then((value) { 
+     Navigator.of(context).pushReplacement(
+        CupertinoPageRoute(builder: (ctx)=> ReminderApp()));
+     });
+       }
+     
+ 
+  @override
+  Widget build(BuildContext context) {
+    return  Scaffold(
+      body: SizedBox(
+        width: double.infinity,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: const [
+            Image(
+              image: AssetImage("assets/ef.png"),width: 300,
+              ),
+               SizedBox(
+                height:40
+                ),
+                  SpinKitThreeBounce(
+                  color: Colors.green,
+                  size: 50.0,
+                  )
+          ],
+        ),
+      ),
+    );
+   }
+  }
+void main2() => runApp(ReminderApp());
+
 
 class ReminderApp extends StatelessWidget {
   @override
@@ -293,3 +357,4 @@ class _ReminderDialogState extends State<ReminderDialog> {
     super.dispose();
   }
 }
+
