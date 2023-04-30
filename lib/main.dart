@@ -131,7 +131,6 @@ class ReminderList extends StatefulWidget {
   _ReminderListState createState() => _ReminderListState();
 }
 
-/////////////
 class _ReminderListState extends State<ReminderList> {
   List<Reminder> _reminders = [];
   late List<bool> isChecked = [];
@@ -300,7 +299,6 @@ class _ReminderListState extends State<ReminderList> {
     );
   }
 }
-///////////////
 
 class ReminderDialog extends StatefulWidget {
   final Function(String, String, DateTime) onAddReminder;
