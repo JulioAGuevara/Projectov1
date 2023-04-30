@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:projecto/src/widget/calendar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import './src/widget/reminder.dart';
 
 void main(){
   runApp(const MyApp());
@@ -69,18 +70,33 @@ class _efigie extends State<efigie>{
 void main2() => runApp(ReminderApp());
 
 
-class ReminderApp extends StatelessWidget {
+class ReminderApp extends StatefulWidget {
+  @override
+  _ReminderAppState createState() => _ReminderAppState();
+}
+
+class _ReminderAppState extends State<ReminderApp> {
+  List<Reminder> _reminders = [];
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       onGenerateRoute: (RouteSettings settings) {
         switch (settings.name) {
           case '/home':
-            return MaterialPageRoute(builder: (context) => ReminderApp());
+            return MaterialPageRoute(
+                builder: (context) => ReminderList(
+                      reminders: _reminders,
+                      onAddReminder: (title, description, date) {
+                        setState(() {
+                          _reminders.add(Reminder(title, description, date));
+                        });
+                      }, title: '',
+                    ));
           case '/calendar':
             return MaterialPageRoute(
                 builder: (context) => Calendar(
-                      reminders: [],
+                      reminders: _reminders,
                     ));
         }
       },
@@ -89,13 +105,25 @@ class ReminderApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: ReminderList(title: 'Pending Tasks'),
+      home: ReminderList(
+        title: 'Pending Tasks',
+        reminders: _reminders,
+        onAddReminder: (title, description, date) {
+          setState(() {
+            _reminders.add(Reminder(title, description, date));
+          });
+        },
+      ),
     );
   }
 }
 
+
 class ReminderList extends StatefulWidget {
-  ReminderList({Key? key, required this.title}) : super(key: key);
+  final List<Reminder> reminders;
+  final Function(String, String, DateTime) onAddReminder;
+
+  ReminderList({Key? key, required this.title, required this.reminders, required this.onAddReminder}) : super(key: key);
 
   final String title;
 
@@ -103,6 +131,7 @@ class ReminderList extends StatefulWidget {
   _ReminderListState createState() => _ReminderListState();
 }
 
+/////////////
 class _ReminderListState extends State<ReminderList> {
   List<Reminder> _reminders = [];
   late List<bool> isChecked = [];
@@ -113,6 +142,17 @@ class _ReminderListState extends State<ReminderList> {
     setState(() {
       _reminders.add(Reminder(title, description, date));
     });
+  }
+  void _showDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => ReminderDialog(
+        onAddReminder: (title, description, date) {
+          widget.onAddReminder(title, description, date);
+          Navigator.pop(context);
+        },
+      ),
+    );
   }
 
   @override
@@ -260,14 +300,7 @@ class _ReminderListState extends State<ReminderList> {
     );
   }
 }
-
-class Reminder {
-  final String title;
-  final String description;
-  final DateTime date;
-
-  Reminder(this.title, this.description, this.date);
-}
+///////////////
 
 class ReminderDialog extends StatefulWidget {
   final Function(String, String, DateTime) onAddReminder;
@@ -281,7 +314,7 @@ class ReminderDialog extends StatefulWidget {
 class _ReminderDialogState extends State<ReminderDialog> {
   late TextEditingController _titleController;
   late TextEditingController _descriptionController;
-  DateTime _selectedDate = DateTime.now();
+  DateTime _selectedDate = DateTime.now().toUtc();
 
   @override
   void initState() {
